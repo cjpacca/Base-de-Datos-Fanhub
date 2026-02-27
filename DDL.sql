@@ -4,7 +4,7 @@ CREATE TABLE Usuario (
 	password_hash varchar(32) NOT NULL,
 	nickname varchar(20) NOT NULL,
 	fecha_registro DATE NOT NULL,
-	fecha_nacimiento DATE NOT NULL,
+	fecha_nacimiento DATE NOT NULL CHECK(fecha_nacimiento <= DATEADD(year, -13, GETDATE())),
 	pais varchar(56) NOT NULL,
 	esta_activo BIT NOT NULL
 );
@@ -16,17 +16,17 @@ CREATE TABLE Categoria (
 );
 
 CREATE TABLE Creador (
-	idUsuario int PRIMARY KEY FOREIGN KEY REFERENCES Usuario(id),
+	idUsuario int PRIMARY KEY FOREIGN KEY REFERENCES Usuario(id) ON DELETE CASCADE,
 	biografia varchar(160),
 	banco_nombre varchar(50) NOT NULL,
 	banco_cuenta varchar(30) NOT NULL,
 	es_nsfw BIT NOT NULL,
-	idCategoria int FOREIGN KEY REFERENCES Categoria(id) NOT NULL
+	idCategoria int NOT NULL FOREIGN KEY REFERENCES Categoria(id)
 );
 
 CREATE TABLE MetodoPago (
 	id int IDENTITY(1,1) NOT NULL,
-	idUsuario int FOREIGN KEY REFERENCES Usuario(id) NOT NULL,
+	idUsuario int NOT NULL FOREIGN KEY REFERENCES Usuario(id),
 	ultimos_4_digitos varchar(4) NOT NULL,
 	marca varchar(32) NOT NULL,
 	titular varchar(64) NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE MetodoPago (
 
 CREATE TABLE NivelSuscripcion (
 	id int IDENTITY(1,1) PRIMARY KEY,
-	idCreador int FOREIGN KEY REFERENCES Creador(idUsuario) NOT NULL,
+	idCreador int NOT NULL FOREIGN KEY REFERENCES Creador(idUsuario) ON DELETE CASCADE,
 	nombre varchar(32) NOT NULL,
 	descripcion varchar(160) NOT NULL,
 	precio_actual NUMERIC(10, 2) NOT NULL CHECK(precio_actual > 0),
@@ -47,8 +47,8 @@ CREATE TABLE NivelSuscripcion (
 
 CREATE TABLE Suscripcion (
 	id int IDENTITY(1,1) PRIMARY KEY,
-	idUsuario int FOREIGN KEY REFERENCES Usuario(id) NOT NULL,
-	idNivel int FOREIGN KEY REFERENCES NivelSuscripcion(id) NOT NULL,
+	idUsuario int NOT NULL FOREIGN KEY REFERENCES Usuario(id),
+	idNivel int NOT NULL FOREIGN KEY REFERENCES NivelSuscripcion(id),
 	fecha_inicio DATE NOT NULL,
 	fecha_renovacion DATE,
 	fecha_fin DATE,
@@ -58,7 +58,7 @@ CREATE TABLE Suscripcion (
 
 CREATE TABLE Factura (
 	id int IDENTITY(1,1) PRIMARY KEY,
-	idSuscripcion int FOREIGN KEY REFERENCES Suscripcion(id) NOT NULL,
+	idSuscripcion int NOT NULL FOREIGN KEY REFERENCES Suscripcion(id),
 	codigo_transaccion varchar(12) NOT NULL,
 	fecha_emision DATE NOT NULL,
 	sub_total NUMERIC(10, 2) NOT NULL CHECK(sub_total > 0),
@@ -68,27 +68,27 @@ CREATE TABLE Factura (
 
 CREATE TABLE Publicacion (
 	id int IDENTITY(1,1) PRIMARY KEY,
-	idCreador int FOREIGN KEY REFERENCES Creador(idUsuario) NOT NULL,
+	idCreador int NOT NULL FOREIGN KEY REFERENCES Creador(idUsuario),
 	titulo varchar(30) NOT NULL,
 	es_publica BIT NOT NULL,
 	tipo_contenido varchar(6) NOT NULL CHECK(tipo_contenido IN('VIDEO', 'TEXTO', 'IMAGEN'))
 );
 
 CREATE TABLE Video (
-	idPublicacion int PRIMARY KEY FOREIGN KEY REFERENCES Publicacion(id),
+	idPublicacion int PRIMARY KEY FOREIGN KEY REFERENCES Publicacion(id) ON DELETE CASCADE,
 	duracion_seg int NOT NULL,
-	resolucion varchar(9) NOT NULL,
+	resolucion varchar(9) NOT NULL CHECK(resolucion IN ('720p', '1080p', '4k')),
 	url_stream varchar(128) NOT NULL
 );
 
 CREATE TABLE Texto (
-	idPublicacion int PRIMARY KEY FOREIGN KEY REFERENCES Publicacion(id),
+	idPublicacion int PRIMARY KEY FOREIGN KEY REFERENCES Publicacion(id) ON DELETE CASCADE,
 	contenido_html varchar(500) NOT NULL,
 	resumen_gratuito varchar(120)
 );
 
 CREATE TABLE Imagen (
-	idPublicacion int PRIMARY KEY FOREIGN KEY REFERENCES Publicacion(id),
+	idPublicacion int PRIMARY KEY FOREIGN KEY REFERENCES Publicacion(id) ON DELETE CASCADE,
 	ancho SMALLINT NOT NULL,
 	alto SMALLINT NOT NULL,
 	formato varchar(3) NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE Imagen (
 CREATE TABLE Comentario (
 	id int IDENTITY(1,1) PRIMARY KEY,
 	idUsuario int FOREIGN KEY REFERENCES Usuario(id) NOT NULL,
-	idPublicacion int FOREIGN KEY REFERENCES Publicacion(id) NOT NULL,
+	idPublicacion int NOT NULL FOREIGN KEY REFERENCES Publicacion(id) ON DELETE CASCADE,
 	idComentarioPadre int FOREIGN KEY REFERENCES Comentario(id),
 	texto varchar(500) NOT NULL,
 	fecha DATE NOT NULL
@@ -114,7 +114,7 @@ CREATE TABLE TipoReaccion (
 CREATE TABLE UsuarioReaccionPublicacion (
 	idUsuario int FOREIGN KEY REFERENCES Usuario(id),
 	idPublicacion int FOREIGN KEY REFERENCES Publicacion(id),
-	idTipoReaccion int FOREIGN KEY REFERENCES TipoReaccion(id) NOT NULL,
+	idTipoReaccion int NOT NULL FOREIGN KEY REFERENCES TipoReaccion(id),
 	fecha_reaccion DATE NOT NULL,
 	CONSTRAINT PK_UsuarioReaccionPublicacion PRIMARY KEY (idUsuario, idPublicacion)
 );
@@ -125,7 +125,7 @@ CREATE TABLE Etiqueta (
 );
 
 CREATE TABLE PublicacionEtiqueta(
-	idPublicacion int FOREIGN KEY REFERENCES Publicacion(id), 
-	idEtiqueta int FOREIGN KEY REFERENCES Etiqueta(id)
+	idPublicacion int FOREIGN KEY REFERENCES Publicacion(id) ON DELETE CASCADE, 
+	idEtiqueta int FOREIGN KEY REFERENCES Etiqueta(id),
 	CONSTRAINT PK_PublicacionEtiqueta PRIMARY KEY (idPublicacion, idEtiqueta)
 );
