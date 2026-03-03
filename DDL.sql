@@ -1,3 +1,24 @@
+USE master;
+GO
+
+-- 1. Cerrar conexiones y borrar la base de datos si existe
+IF EXISTS (SELECT * FROM sys.databases WHERE name = 'FanHub_Proyecto')
+BEGIN
+    ALTER DATABASE FanHub_Proyecto SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE FanHub_Proyecto;
+END
+GO
+
+-- 2. Crear la base de datos desde cero
+CREATE DATABASE FanHub_Proyecto;
+GO
+
+USE FanHub_Proyecto;
+GO
+
+-- AQUÍ DEBES PEGAR TU DDL (CREATE TABLE...)
+-- LUEGO TUS INSERTS
+
 CREATE TABLE Usuario (
 	id int IDENTITY(1,1) PRIMARY KEY,
 	email varchar(320) NOT NULL,
