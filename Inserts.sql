@@ -1,4 +1,4 @@
-USE Fanhub_Proyecto;
+USE FANHUB;
 GO
 
 PRINT 'Limpiando datos previos para permitir re-ejecución total...';
@@ -744,4 +744,52 @@ INSERT INTO MetodoPago (idUsuario, ultimos_4_digitos, marca, titular, fecha_expi
 (248, '2481', 'Visa', 'U248', '2026-01-01', 1),
 (249, '2491', 'Elo', 'U249', '2029-01-01', 1),
 (250, '2501', 'MasterCard', 'U250', '2027-01-01', 1);
+GO
+
+PRINT 'Insertando Niveles de Suscripción para los 25 creadores...';
+
+-- Creador 1: DiegoDev (Tecnología)
+INSERT INTO NivelSuscripcion (idCreador, nombre, descripcion, precio_actual, esta_activo, orden) VALUES
+(1, 'Soporte Básico', 'Acceso a consultas simples sobre SQL.', 5.00, 1, 1),
+(1, 'Premium Dev', 'Consultoría técnica y acceso a repositorios.', 25.00, 1, 2);
+
+-- Creador 2: ValenFit (Fitness)
+INSERT INTO NivelSuscripcion (idCreador, nombre, descripcion, precio_actual, esta_activo, orden) VALUES
+(2, 'Rutinas Semanales', 'Videos de ejercicios guiados.', 10.00, 1, 1),
+(2, 'Atleta Elite', 'Plan nutricional y seguimiento.', 45.00, 1, 2);
+
+-- Creador 3: CJPACCA (Gaming)
+INSERT INTO NivelSuscripcion (idCreador, nombre, descripcion, precio_actual, esta_activo, orden) VALUES
+(3, 'Fan Base', 'Insignia de suscriptor en el chat.', 4.99, 1, 1),
+(3, 'Pro Gamer', 'Juega conmigo partidas clasificatorias.', 15.00, 1, 2),
+(3, 'MVP Legend', 'Clases personalizadas de estrategia.', 50.00, 1, 3);
+
+-- Creadores NSFW (IDs 9, 16, 20, 23, 25)
+INSERT INTO NivelSuscripcion (idCreador, nombre, descripcion, precio_actual, esta_activo, orden) VALUES
+(9, 'Acceso VIP', 'Contenido exclusivo sin censura.', 30.00, 1, 1),
+(16, 'Cosplay Galería', 'Sesiones fotográficas completas.', 20.00, 1, 1),
+(20, 'Arte Privado', 'Bocetos y dibujos digitales exclusivos.', 12.00, 1, 1),
+(23, 'Sesión Artística', 'Fotos en alta resolución exclusivas.', 25.00, 1, 1),
+(25, 'Modelaje VIP', 'Videos exclusivos detrás de cámaras.', 35.00, 1, 1);
+
+-- Para el resto de los creadores (4-8, 10-15, 17-19, 21, 22, 24)
+-- Insertamos un nivel estándar para cada uno
+INSERT INTO NivelSuscripcion (idCreador, nombre, descripcion, precio_actual, esta_activo, orden) VALUES
+(4, 'Chef Fan', 'Recetas exclusivas en PDF.', 7.99, 1, 1),
+(5, 'Tech Supporter', 'Reviews antes que nadie.', 5.99, 1, 1),
+(6, 'Relax VIP', 'Audios ASMR personalizados.', 8.50, 1, 1),
+(7, 'Viajero Pro', 'Guías detalladas de viajes.', 12.00, 1, 1),
+(8, 'Art Collector', 'Ilustraciones en alta calidad.', 10.00, 1, 1),
+(10, 'Trendy Fan', 'Tips de moda exclusivos.', 9.00, 1, 1),
+(11, 'Analista Político', 'Boletín de noticias semanal.', 4.99, 1, 1),
+(12, 'Investigador VIP', 'Casos de crímenes sin censura.', 6.50, 1, 1),
+(13, 'Músico Fan', 'Partituras y tablaturas.', 11.00, 1, 1),
+(14, 'Dog Lover', 'Tips de adiestramiento avanzado.', 8.00, 1, 1),
+(15, 'Inversionista Pro', 'Análisis de mercado diario.', 40.00, 1, 1),
+(17, 'Cinefilo VIP', 'Críticas de estreno exclusivas.', 3.50, 1, 1),
+(18, 'Otaku Elite', 'Capítulos de manga traducidos.', 6.00, 1, 1),
+(19, 'Artesano VIP', 'Planos para proyectos DIY.', 7.00, 1, 1),
+(21, 'Modelaje Fan', 'Detrás de cámaras de fotos.', 15.00, 1, 1),
+(22, 'Tarot VIP', 'Lectura de cartas mensual.', 20.00, 1, 1),
+(24, 'Podcast Listener', 'Episodios sin publicidad.', 2.99, 1, 1);
 GO
