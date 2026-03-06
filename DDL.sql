@@ -80,7 +80,7 @@ CREATE TABLE Suscripcion (
 CREATE TABLE Factura (
 	id int IDENTITY(1,1) PRIMARY KEY,
 	idSuscripcion int NOT NULL FOREIGN KEY REFERENCES Suscripcion(id),
-	codigo_transaccion varchar(12) NOT NULL,
+	codigo_transaccion varchar(50) NOT NULL,
 	fecha_emision DATE NOT NULL,
 	sub_total NUMERIC(10, 2) NOT NULL CHECK(sub_total > 0),
 	monto_impuesto NUMERIC(10,2) NOT NULL CHECK(monto_impuesto > 0),
