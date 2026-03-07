@@ -92,7 +92,8 @@ CREATE TABLE Publicacion (
 	idCreador int NOT NULL FOREIGN KEY REFERENCES Creador(idUsuario),
 	titulo varchar(30) NOT NULL,
 	es_publica BIT NOT NULL,
-	tipo_contenido varchar(6) NOT NULL CHECK(tipo_contenido IN('VIDEO', 'TEXTO', 'IMAGEN'))
+	tipo_contenido varchar(6) NOT NULL CHECK(tipo_contenido IN('VIDEO', 'TEXTO', 'IMAGEN')),
+	fecha_publicacion DATE NOT NULL
 );
 
 CREATE TABLE Video (
@@ -112,7 +113,7 @@ CREATE TABLE Imagen (
 	idPublicacion int PRIMARY KEY FOREIGN KEY REFERENCES Publicacion(id) ON DELETE CASCADE,
 	ancho SMALLINT NOT NULL,
 	alto SMALLINT NOT NULL,
-	formato varchar(3) NOT NULL,
+	formato varchar(10) NOT NULL,
 	alt_text varchar(64),
 	url_imagen varchar(124) NOT NULL
 );
