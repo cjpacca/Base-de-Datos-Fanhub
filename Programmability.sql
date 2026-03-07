@@ -46,24 +46,39 @@ CREATE OR ALTER FUNCTION fn_calcular_reputacion (@idCreador_v INT)
 RETURNS NUMERIC(10, 2)
 AS
 BEGIN
-    DECLARE @reputacion NUMERIC(10,2)
+    DECLARE @reputacion NUMERIC(10,2);
 
+    DECLARE @total_suscriptores INT = 0;
+    DECLARE @antiguedad_meses INT = 0;
+    DECLARE @reacciones_ultimo_mes INT = 0;
+    
+    SELECT @total_suscriptores = COUNT(*)
+    FROM NivelSuscripcion ns
+    JOIN Suscripcion s ON(s.idNivel = ns.id)
+    WHERE ns.idCreador = @idCreador_v AND s.estado = 'Activa';
 
+    SELECT @antiguedad_meses = DATEDIFF(MONTH, u.fecha_registro, GETDATE())
+    FROM Usuario u
+    WHERE u.id = @idCreador_v;
+
+    SELECT @reacciones_ultimo_mes = COUNT(*)
+    FROM Publicacion p
+    JOIN UsuarioReaccionPublicacion urp ON(urp.idPublicacion = p.id)
+    WHERE p.idCreador = @idCreador_v AND urp.fecha_reaccion > DATEADD(MONTH, -1, GETDATE())
+
+    SET @reputacion = (@total_suscriptores * 0.5) + (@reacciones_ultimo_mes * 0.1) +(@antiguedad_meses * 2);
 
     IF @reputacion > 100 
     BEGIN
-        RETURN 100.0
+        RETURN 100.0;
     END
     
-    ELSE IF @reputacion < 0 
+    IF @reputacion < 0 
     BEGIN
-        RETURN 0.0
+        RETURN 0.0;
     END
     
-    ELSE
-    BEGIN 
-        RETURN @reputacion;
-    END
-    RETURN 0.0;
+    RETURN @reputacion;
+    
 END;
 GO
