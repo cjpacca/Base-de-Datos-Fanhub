@@ -3365,3 +3365,22 @@ INSERT INTO PublicacionEtiqueta (idPublicacion, idEtiqueta) VALUES
 (781,31), (782,32), (783,33), (784,34), (785,35), (786,36), (787,37), (788,38), (789,39), (790,40),
 (791,41), (792,42), (793,43), (794,44), (795,45), (796,46), (797,47), (798,48), (799,49), (800,50);
 GO
+
+--INSERTS PARA CONSULTAS QUE NO RETORNAN NADA
+
+--lurker diego pro
+INSERT INTO Usuario (email, password_hash, nickname, fecha_registro, fecha_nacimiento, pais, esta_activo) VALUES
+('diegopro@gmail.com', 'h102', 'diegopro', '2020-04-04', '2000-02-02', 'Venezuela', 1);
+GO
+
+INSERT INTO Suscripcion (idUsuario, idNivel, fecha_inicio, fecha_renovacion, fecha_fin, estado, precio_pactado) VALUES
+(251, 1, '2026-02-20', '2026-03-20', NULL, 'Activa', 5.00);
+GO
+
+INSERT INTO MetodoPago (idUsuario, ultimos_4_digitos, marca, titular, fecha_expiracion, es_predeterminado) VALUES
+(251, '1212', 'Visa', 'diegoproo', '2027-12-01', 1);
+GO
+
+INSERT INTO Factura (idSuscripcion, codigo_transaccion, fecha_emision, sub_total, monto_impuesto, monto_total) VALUES
+(501, '20280110-26', '2026-01-10', 5.00, 0.80, 5.80);
+GO

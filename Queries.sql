@@ -30,19 +30,6 @@ GO
 
 GO
 
-
-
--- 12. Tendencias (Tags): Top 3 etiquetas más usadas el último mes.
--- ○ Columnas a mostrar: Nombre Etiqueta, Cantidad Publicaciones.
-
-GO
-
--- 13. Cobertura Total de Reacciones: Usuarios que han usado todos los tipos de reacción
--- del catálogo.
--- ○ Columnas a mostrar: Nickname, Total Reacciones Realizadas.
-
-GO
-
 -- 14. Reporte de Nómina (Liquidación): Generar el listado de pagos a realizar a los
 -- creadores correspondiente al mes actual. La plataforma cobra una comisión del 20%
 -- sobre el total facturado.
@@ -163,14 +150,14 @@ SELECT
   + CAST((SUM(v.duracion_seg) % 3600) / 60 AS VARCHAR(10)) + 'm '
   + CAST((SUM(v.duracion_seg) % 60) AS VARCHAR(10)) + 's'
   AS 'Tiempo Total Formateado',
-  SUM
+  CAST(SUM
   (
     CASE
 	  WHEN v.resolucion = '4K' THEN v.duracion_seg / 60.0 * 0.5
 	  WHEN v.resolucion = '1080p' THEN v.duracion_seg / 60.0 * 0.1
 	  ELSE v.duracion_seg / 60.0 * 0.05
 	END
-  ) AS 'Estimacion GB'
+  ) AS NUMERIC(10,2)) AS 'Estimacion GB'
 FROM Creador c
 JOIN Usuario u ON (u.id = c.idUsuario)
 JOIN Categoria cat ON (c.idCategoria = cat.id)
@@ -198,6 +185,7 @@ FROM Usuario u
 JOIN Suscripcion s ON(s.idUsuario = u.id)
 JOIN Factura f ON(f.idSuscripcion = s.id)
 GROUP BY u.pais
+ORDER BY SUM(f.monto_total) DESC
 GO
 
 -- 7. Intereses Cruzados: Listar usuarios con suscripciones en "Tecnología" Y "Fitness" (o
@@ -239,7 +227,7 @@ WHERE u.esta_activo = 1
 GROUP BY
   CASE
 	WHEN (YEAR(u.fecha_nacimiento) < 1981) THEN 'X'
-	WHEN (YEAR(u.fecha_nacimiento) > 2000) THEN 'Z'
+	WHEN (YEAR(u.fecha_nacimiento) > 2000) THEN 'Gen Z'
 	ELSE 'Millenials'
   END;
 GO
@@ -272,7 +260,7 @@ WITH comentarios_creadorCTE AS
 SELECT 
   u.nickname AS 'Nickname',
   pc.total_publicaciones AS 'Cantidad Posts Evaluados',
-  ((cc.total_comentarios * 1.0) / NULLIF(rc.total_reacciones, 0)) AS 'Ratio Promedio'
+  CAST(((cc.total_comentarios * 1.0) / NULLIF(rc.total_reacciones, 0)) AS numeric(10,2)) AS 'Ratio Promedio'
 FROM Creador c 
 JOIN Usuario u ON (u.id = c.idUsuario)
 JOIN reacciones_creadorCTE rc ON (rc.idCreador = c.idUsuario)
@@ -300,4 +288,31 @@ JOIN Suscripcion s ON(s.idUsuario = u.id)
 JOIN Factura f ON(f.idSuscripcion = s.id)
 WHERE u.id NOT IN (SELECT id FROM usuarios_con_reaccionCTE) AND s.estado = 'Activa'
 GROUP BY u.id, u.nickname
+GO
+
+-- 12. Tendencias (Tags): Top 3 etiquetas más usadas el último mes.
+-- ○ Columnas a mostrar: Nombre Etiqueta, Cantidad Publicaciones.
+
+SELECT TOP 3
+  e.nombre AS 'Nombre Etiqueta', 
+  COUNT(*) AS 'Cantidad Publicaciones'
+FROM Etiqueta e
+JOIN PublicacionEtiqueta pe ON(pe.idEtiqueta = e.id)
+JOIN Publicacion p ON(p.id = pe.idPublicacion)
+WHERE p.fecha_publicacion > DATEADD(MONTH, -1, GETDATE())
+GROUP BY e.nombre
+ORDER BY COUNT(*) DESC
+GO
+
+-- 13. Cobertura Total de Reacciones: Usuarios que han usado todos los tipos de reacción
+-- del catálogo.
+-- ○ Columnas a mostrar: Nickname, Total Reacciones Realizadas.
+
+SELECT 
+  u.nickname AS 'Nickname',
+  COUNT(*) AS 'Total Reacciones Realizadas'
+FROM Usuario u
+JOIN UsuarioReaccionPublicacion urp ON(urp.idUsuario = u.id)
+GROUP BY u.id, u.nickname
+HAVING COUNT(DISTINCT urp.idTipoReaccion) = (SELECT COUNT(*) FROM TipoReaccion);
 GO
